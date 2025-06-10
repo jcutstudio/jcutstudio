@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import emailjs from '@emailjs/browser';
 import { Button } from "@/components/ui/button";
@@ -30,7 +29,7 @@ const Contact = () => {
     try {
       const result = await emailjs.sendForm(
         'service_s7ez6ik', // Your EmailJS service ID
-        'template_contact', // You'll need to create a template with this ID in EmailJS
+        'template_nxnz9yn', // Your EmailJS template ID
         form.current,
         'LNVt0yzjNtQZoVvK-' // Your EmailJS public key
       );
@@ -224,12 +223,12 @@ const Contact = () => {
                   ✅ EmailJS Setup Complete!
                 </h4>
                 <p className="text-gray-400 text-sm mb-4">
-                  Your contact form is now configured. Make sure to create an email template with ID "template_contact" in your EmailJS dashboard.
+                  Your contact form is now configured. Your email template "template_nxnz9yn" is ready to receive submissions.
                 </p>
                 <div className="text-xs text-gray-500 space-y-1">
                   <p>• Service ID: service_s7ez6ik ✓</p>
+                  <p>• Template ID: template_nxnz9yn ✓</p>
                   <p>• Public Key: Configured ✓</p>
-                  <p>• Next: Create email template in EmailJS dashboard</p>
                 </div>
               </CardContent>
             </Card>
