@@ -1,37 +1,64 @@
-
-import { useState } from "react";
+import { useState, useRef } from "react";
+import emailjs from '@emailjs/browser';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Send, CheckCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Send, CheckCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Contact = () => {
+  const form = useRef<HTMLFormElement>(null);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
+    user_name: "",
+    user_email: "",
     message: ""
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
     
-    // Simulate form submission
-    setIsSubmitted(true);
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for reaching out. I'll get back to you soon!",
-    });
+    if (!form.current) return;
 
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setFormData({ name: "", email: "", message: "" });
-      setIsSubmitted(false);
-    }, 3000);
+    setIsLoading(true);
+    console.log("Sending email via EmailJS...");
+
+    try {
+      // Replace these with your EmailJS credentials
+      const result = await emailjs.sendForm(
+        'YOUR_SERVICE_ID', // Replace with your EmailJS service ID
+        'YOUR_TEMPLATE_ID', // Replace with your EmailJS template ID
+        form.current,
+        'YOUR_PUBLIC_KEY' // Replace with your EmailJS public key
+      );
+
+      console.log("Email sent successfully:", result.text);
+      
+      setIsSubmitted(true);
+      toast({
+        title: "Message Sent Successfully!",
+        description: "Thank you for reaching out. I'll get back to you within 24 hours!",
+      });
+
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setFormData({ user_name: "", user_email: "", message: "" });
+        setIsSubmitted(false);
+      }, 3000);
+
+    } catch (error) {
+      console.error("Failed to send email:", error);
+      toast({
+        title: "Failed to Send Message",
+        description: "Please try again or contact me directly at bhushieth@gmail.com",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -87,29 +114,31 @@ const Contact = () => {
                 <div className="text-center py-8">
                   <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
                   <h4 className="text-xl font-bold text-white mb-2">Message Sent!</h4>
-                  <p className="text-gray-400">Thank you for reaching out. I'll get back to you soon!</p>
+                  <p className="text-gray-400">Thank you for reaching out. I'll get back to you within 24 hours!</p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form ref={form} onSubmit={handleSubmit} className="space-y-6">
                   <div>
                     <Input
-                      name="name"
+                      name="user_name"
                       placeholder="Your Name"
-                      value={formData.name}
+                      value={formData.user_name}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                       className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-cyan-400"
                     />
                   </div>
                   
                   <div>
                     <Input
-                      name="email"
+                      name="user_email"
                       type="email"
                       placeholder="Your Email"
-                      value={formData.email}
+                      value={formData.user_email}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                       className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-cyan-400"
                     />
                   </div>
@@ -121,6 +150,7 @@ const Contact = () => {
                       value={formData.message}
                       onChange={handleChange}
                       required
+                      disabled={isLoading}
                       rows={6}
                       className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-cyan-400 resize-none"
                     />
@@ -128,10 +158,20 @@ const Contact = () => {
                   
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-cyan-500 to-orange-500 hover:from-cyan-600 hover:to-orange-600 text-white py-6 text-lg rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25"
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-cyan-500 to-orange-500 hover:from-cyan-600 hover:to-orange-600 text-white py-6 text-lg rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-cyan-500/25 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   >
-                    <Send className="w-5 h-5 mr-2" />
-                    Send Message
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-5 h-5 mr-2" />
+                        Send Message
+                      </>
+                    )}
                   </Button>
                 </form>
               )}
@@ -176,6 +216,23 @@ const Contact = () => {
                 );
               })}
             </div>
+
+            {/* Setup Instructions Card */}
+            <Card className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 backdrop-blur-sm border-yellow-400/20">
+              <CardContent className="p-6">
+                <h4 className="text-lg font-bold text-white mb-2">
+                  📧 EmailJS Setup Required
+                </h4>
+                <p className="text-gray-400 text-sm mb-4">
+                  To receive form submissions, please set up your EmailJS credentials in the Contact component.
+                </p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <p>1. Create account at emailjs.com</p>
+                  <p>2. Connect your Gmail account</p>
+                  <p>3. Replace YOUR_SERVICE_ID, YOUR_TEMPLATE_ID, YOUR_PUBLIC_KEY</p>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* CTA Section */}
             <Card className="bg-gradient-to-r from-cyan-500/10 to-orange-500/10 backdrop-blur-sm border-cyan-400/20">
