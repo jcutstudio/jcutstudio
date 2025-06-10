@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import emailjs from '@emailjs/browser';
 import { Button } from "@/components/ui/button";
@@ -27,12 +28,11 @@ const Contact = () => {
     console.log("Sending email via EmailJS...");
 
     try {
-      // Replace these with your EmailJS credentials
       const result = await emailjs.sendForm(
-        'YOUR_SERVICE_ID', // Replace with your EmailJS service ID
-        'YOUR_TEMPLATE_ID', // Replace with your EmailJS template ID
+        'service_s7ez6ik', // Your EmailJS service ID
+        'template_contact', // You'll need to create a template with this ID in EmailJS
         form.current,
-        'YOUR_PUBLIC_KEY' // Replace with your EmailJS public key
+        'LNVt0yzjNtQZoVvK-' // Your EmailJS public key
       );
 
       console.log("Email sent successfully:", result.text);
@@ -218,18 +218,18 @@ const Contact = () => {
             </div>
 
             {/* Setup Instructions Card */}
-            <Card className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 backdrop-blur-sm border-yellow-400/20">
+            <Card className="bg-gradient-to-r from-green-500/10 to-blue-500/10 backdrop-blur-sm border-green-400/20">
               <CardContent className="p-6">
                 <h4 className="text-lg font-bold text-white mb-2">
-                  📧 EmailJS Setup Required
+                  ✅ EmailJS Setup Complete!
                 </h4>
                 <p className="text-gray-400 text-sm mb-4">
-                  To receive form submissions, please set up your EmailJS credentials in the Contact component.
+                  Your contact form is now configured. Make sure to create an email template with ID "template_contact" in your EmailJS dashboard.
                 </p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <p>1. Create account at emailjs.com</p>
-                  <p>2. Connect your Gmail account</p>
-                  <p>3. Replace YOUR_SERVICE_ID, YOUR_TEMPLATE_ID, YOUR_PUBLIC_KEY</p>
+                  <p>• Service ID: service_s7ez6ik ✓</p>
+                  <p>• Public Key: Configured ✓</p>
+                  <p>• Next: Create email template in EmailJS dashboard</p>
                 </div>
               </CardContent>
             </Card>
